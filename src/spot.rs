@@ -7,27 +7,13 @@ use crate::{
 };
 
 impl Client {
-    pub async fn server_ping(&self) -> ClientResult<ServerPing> {
-        let mut url = self.base_url()?;
-        url.set_path("/api/v3/ping");
-
-        self.build_request_get(url).send().await
-    }
-
-    pub async fn server_time(&self) -> ClientResult<ServerTime> {
-        let mut url = self.base_url()?;
-        url.set_path("/api/v3/time");
-
-        self.build_request_get(url).send().await
-    }
-
     pub async fn spot_market_order_with_quote(
         &self,
         symbol: &Symbol,
         side: OrderSide,
         quote_quantity: &Quantity,
         recv_window: Option<u8>,
-    ) -> ClientResult<OrderResponseFULL> {
+    ) -> ClientResult<OrderResponseFull> {
         let mut url = self.base_url()?;
         url.set_path("/api/v3/order");
 
@@ -59,7 +45,7 @@ impl Client {
         side: OrderSide,
         base_quantity: &Quantity,
         recv_window: Option<u8>,
-    ) -> ClientResult<OrderResponseFULL> {
+    ) -> ClientResult<OrderResponseFull> {
         let mut url = self.base_url()?;
         url.set_path("/api/v3/order");
 
@@ -85,15 +71,6 @@ impl Client {
             .await
     }
 }
-
-#[derive(Debug, Serialize, Deserialize)]
-pub struct ServerTime {
-    #[serde(rename = "serverTime")]
-    server_time: u128,
-}
-
-#[derive(Debug, Serialize, Deserialize)]
-pub struct ServerPing {}
 
 #[derive(Debug, Serialize, Deserialize)]
 pub enum OrderSide {
@@ -200,7 +177,7 @@ pub struct OrderFill {
 }
 
 #[derive(Debug, Serialize, Deserialize)]
-pub struct OrderResponseFULL {
+pub struct OrderResponseFull {
     symbol: Symbol,
 
     #[serde(rename = "orderId")]
@@ -249,19 +226,7 @@ pub struct OrderResponseFULL {
 mod tests {
     use super::OrderSide;
 
-    use crate::http::client::tests::{client, client_with_test_net_key_secret};
-
-    #[tokio::test]
-    async fn test_server_time() {
-        let client = client();
-        client.server_time().await.unwrap();
-    }
-
-    #[tokio::test]
-    async fn test_server_ping() {
-        let client = client();
-        client.server_ping().await.unwrap();
-    }
+    use crate::http::client::tests::client_with_test_net_key_secret;
 
     #[tokio::test]
     async fn test_spot_market_order() {

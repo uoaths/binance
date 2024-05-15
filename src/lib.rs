@@ -20,8 +20,11 @@ pub mod types {
     pub type Quantity = String;
 
     pub use super::account::{ApiRestrictions, GetUserAsset};
+    pub use super::market::{
+        ExchangeInfo, Filter, RateLimit, ServerPing, ServerTime, SymbolInfo, SymbolPrice,
+    };
     pub use super::spot::{
-        OrderFill, OrderResponseFULL, OrderSide, OrderStatus, OrderType, SelfTradePreventionMode,
-        ServerPing, ServerTime, TimeInForce,
+        OrderFill, OrderResponseFull, OrderSide, OrderStatus, OrderType, SelfTradePreventionMode,
+        TimeInForce,
     };
 }
