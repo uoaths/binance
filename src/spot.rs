@@ -97,6 +97,51 @@ impl Client {
             .send()
             .await
     }
+
+    pub async fn spot_all_order_info(
+        &self,
+        symbol: &Symbol,
+        id: Option<i64>,
+        start_time: Option<u128>,
+        end_time: Option<u128>,
+        limit: Option<u16>,
+        recv_window: Option<u8>,
+    ) -> ClientResult<Vec<OrderInfo>> {
+        let mut url = self.base_url()?;
+        url.set_path("/api/v3/allOrders");
+
+        {
+            let mut query_pairs = url.query_pairs_mut();
+
+            if let Some(value) = id {
+                query_pairs.append_pair("orderId", &value.to_string());
+            }
+
+            if let Some(value) = start_time {
+                query_pairs.append_pair("startTime", &value.to_string());
+            }
+
+            if let Some(value) = end_time {
+                query_pairs.append_pair("endTime", &value.to_string());
+            }
+
+            if let Some(value) = limit {
+                query_pairs.append_pair("limit", &value.to_string());
+            }
+
+            if let Some(value) = recv_window {
+                query_pairs.append_pair("recvWindow", &value.to_string());
+            }
+
+            query_pairs.append_pair("symbol", symbol);
+            query_pairs.append_pair("timestamp", &timestamp().as_millis().to_string());
+        }
+
+        self.build_sign_request_get(url)?
+            .with_api_key(self.secret.api_key()?)
+            .send()
+            .await
+    }
 }
 
 #[derive(Debug, Serialize, Deserialize)]
@@ -366,6 +411,11 @@ mod tests {
 
         client
             .spot_order_info(order.order_id, &order.symbol, None)
+            .await
+            .unwrap();
+
+        client
+            .spot_all_order_info(&order.symbol, None, None, None, None, None)
             .await
             .unwrap();
     }
