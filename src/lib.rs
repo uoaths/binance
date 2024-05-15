@@ -29,7 +29,7 @@ pub mod types {
         ExchangeInfo, Filter, RateLimit, ServerPing, ServerTime, SymbolInfo, SymbolPrice,
     };
     pub use super::spot::{
-        OrderFill, OrderResponseFull, OrderSide, OrderStatus, OrderType, SelfTradePreventionMode,
-        TimeInForce,
+        OrderFill, OrderInfo, OrderResponseFull, OrderSide, OrderStatus, OrderType,
+        SelfTradePreventionMode, TimeInForce,
     };
 }

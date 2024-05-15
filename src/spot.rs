@@ -70,6 +70,91 @@ impl Client {
             .send()
             .await
     }
+
+    pub async fn spot_order_info(
+        &self,
+        id: i64,
+        symbol: &Symbol,
+        recv_window: Option<u8>,
+    ) -> ClientResult<OrderInfo> {
+        let mut url = self.base_url()?;
+        url.set_path("/api/v3/order");
+
+        {
+            let mut query_pairs = url.query_pairs_mut();
+
+            if let Some(value) = recv_window {
+                query_pairs.append_pair("recvWindow", &value.to_string());
+            }
+
+            query_pairs.append_pair("symbol", symbol);
+            query_pairs.append_pair("orderId", &id.to_string());
+            query_pairs.append_pair("timestamp", &timestamp().as_millis().to_string());
+        }
+
+        self.build_sign_request_get(url)?
+            .with_api_key(self.secret.api_key()?)
+            .send()
+            .await
+    }
+}
+
+#[derive(Debug, Serialize, Deserialize)]
+pub struct OrderInfo {
+    pub symbol: Symbol,
+
+    #[serde(rename = "orderId")]
+    pub order_id: i64,
+
+    #[serde(rename = "orderListId")]
+    pub order_list_id: i64,
+
+    #[serde(rename = "clientOrderId")]
+    pub client_order_id: String,
+
+    pub price: Price,
+
+    #[serde(rename = "origQty")]
+    pub orig_qty: Quantity,
+
+    #[serde(rename = "executedQty")]
+    pub executed_qty: Quantity,
+
+    #[serde(rename = "cummulativeQuoteQty")]
+    pub cummulative_quote_qty: Quantity,
+
+    pub status: OrderStatus,
+
+    #[serde(rename = "timeInForce")]
+    pub time_in_force: String,
+
+    #[serde(rename = "type")]
+    pub order_type: OrderType,
+
+    pub side: OrderSide,
+
+    #[serde(rename = "stopPrice")]
+    pub stop_price: Price,
+
+    #[serde(rename = "icebergQty")]
+    pub iceberg_qty: String,
+
+    pub time: u128,
+
+    #[serde(rename = "updateTime")]
+    pub update_time: u128,
+
+    #[serde(rename = "isWorking")]
+    pub is_working: bool,
+
+    #[serde(rename = "workingTime")]
+    pub working_time: u128,
+
+    #[serde(rename = "origQuoteOrderQty")]
+    pub orig_quote_order_qty: Quantity,
+
+    #[serde(rename = "selfTradePreventionMode")]
+    pub self_trade_prevention_mode: String,
 }
 
 #[derive(Debug, Serialize, Deserialize)]
@@ -262,6 +347,25 @@ mod tests {
 
         client
             .spot_market_order_with_base(&"BTCUSDT".into(), OrderSide::Sell, &"0.0001".into(), None)
+            .await
+            .unwrap();
+    }
+
+    #[tokio::test]
+    async fn test_spot_order_info() {
+        let client = client_with_test_net_key_secret();
+        let order = client
+            .spot_market_order_with_quote(
+                &"BTCUSDT".into(),
+                OrderSide::Buy,
+                &"10.14159".into(),
+                None,
+            )
+            .await
+            .unwrap();
+
+        client
+            .spot_order_info(order.order_id, &order.symbol, None)
             .await
             .unwrap();
     }
