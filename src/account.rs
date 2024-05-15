@@ -3,16 +3,16 @@ use serde::{Deserialize, Serialize};
 use crate::{
     http::client::{Client, ClientResult},
     time::timestamp,
-    types::{Decimal, Symbol},
+    types::{Asset, Commission, Decimal, Quantity},
 };
 
 impl Client {
-    pub async fn get_user_asset(
+    pub async fn user_asset(
         &self,
         asset: Option<&String>,
         need_btc_valuation: Option<bool>,
         recv_window: Option<u8>,
-    ) -> ClientResult<Vec<GetUserAsset>> {
+    ) -> ClientResult<Vec<UserAsset>> {
         let mut url = self.base_url()?;
         url.set_path("/sapi/v3/asset/getUserAsset");
 
@@ -40,10 +40,7 @@ impl Client {
             .await
     }
 
-    pub async fn get_api_restrictions(
-        &self,
-        recv_window: Option<u8>,
-    ) -> ClientResult<ApiRestrictions> {
+    pub async fn api_restrictions(&self, recv_window: Option<u8>) -> ClientResult<ApiRestrictions> {
         let mut url = self.base_url()?;
         url.set_path("/sapi/v1/account/apiRestrictions");
 
@@ -62,11 +59,39 @@ impl Client {
             .send()
             .await
     }
+
+    pub async fn spot_account(
+        &self,
+        omit_zero_balances: Option<bool>,
+        recv_window: Option<u8>,
+    ) -> ClientResult<SpotAccount> {
+        let mut url = self.base_url()?;
+        url.set_path("/api/v3/account");
+
+        {
+            let mut query_pairs = url.query_pairs_mut();
+
+            if let Some(value) = omit_zero_balances {
+                query_pairs.append_pair("omitZeroBalances", &value.to_string());
+            }
+
+            if let Some(value) = recv_window {
+                query_pairs.append_pair("recvWindow", &value.to_string());
+            }
+
+            query_pairs.append_pair("timestamp", &timestamp().as_millis().to_string());
+        }
+
+        self.build_sign_request_get(url)?
+            .with_api_key(self.secret.api_key()?)
+            .send()
+            .await
+    }
 }
 
 #[derive(Debug, Serialize, Deserialize)]
-pub struct GetUserAsset {
-    pub asset: Symbol,
+pub struct UserAsset {
+    pub asset: Asset,
     pub free: Decimal,
     pub locked: Decimal,
     pub freeze: Decimal,
@@ -113,19 +138,89 @@ pub struct ApiRestrictions {
     pub enable_margin: bool,
 }
 
+#[derive(Debug, Serialize, Deserialize)]
+pub struct SpotAccount {
+    #[serde(rename = "makerCommission")]
+    pub maker_commission: u32,
+
+    #[serde(rename = "takerCommission")]
+    pub taker_commission: u32,
+
+    #[serde(rename = "buyerCommission")]
+    pub buyer_commission: u32,
+
+    #[serde(rename = "sellerCommission")]
+    pub seller_commission: u32,
+
+    #[serde(rename = "commissionRates")]
+    pub commission_rates: CommissionRates,
+
+    #[serde(rename = "canTrade")]
+    pub can_trade: bool,
+
+    #[serde(rename = "canWithdraw")]
+    pub can_withdraw: bool,
+
+    #[serde(rename = "canDeposit")]
+    pub can_deposit: bool,
+
+    pub brokered: bool,
+
+    #[serde(rename = "requireSelfTradePrevention")]
+    pub require_self_trade_prevention: bool,
+
+    #[serde(rename = "preventSor")]
+    pub prevent_sor: bool,
+
+    #[serde(rename = "updateTime")]
+    pub update_time: u64,
+
+    #[serde(rename = "accountType")]
+    pub account_type: String,
+
+    pub balances: Vec<Balance>,
+
+    pub permissions: Vec<String>,
+
+    pub uid: i64,
+}
+
+#[derive(Debug, Serialize, Deserialize)]
+pub struct CommissionRates {
+    pub maker: Commission,
+    pub taker: Commission,
+    pub buyer: Commission,
+    pub seller: Commission,
+}
+
+#[derive(Debug, Serialize, Deserialize)]
+pub struct Balance {
+    pub asset: Asset,
+    pub free: Quantity,
+
+    #[serde(rename = "locked")]
+    pub locked_amount: Quantity,
+}
+
 #[cfg(test)]
 mod tests {
     use crate::http::client::tests::client_with_key_secret;
 
     #[tokio::test]
-    async fn test_get_user_asset() {
+    async fn test_user_asset() {
         let client = client_with_key_secret();
-        client.get_user_asset(None, None, None).await.unwrap();
+        client.user_asset(None, None, None).await.unwrap();
     }
 
     #[tokio::test]
-    async fn test_get_api_restrictions() {
+    async fn test_api_restrictions() {
         let client = client_with_key_secret();
-        client.get_api_restrictions(None).await.unwrap();
+        client.api_restrictions(None).await.unwrap();
+    }
+
+    #[tokio::test]
+    async fn test_spot_account() {
+        let client = client_with_key_secret();
+        client.spot_account(None, None).await.unwrap();
     }
 }

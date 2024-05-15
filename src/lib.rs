@@ -15,11 +15,13 @@ pub mod error {
 
 pub mod types {
     pub type Price = String;
+    pub type Asset = String;
     pub type Symbol = String;
     pub type Decimal = String;
     pub type Quantity = String;
+    pub type Commission = Decimal;
 
-    pub use super::account::{ApiRestrictions, GetUserAsset};
+    pub use super::account::{ApiRestrictions, Balance, CommissionRates, SpotAccount, UserAsset};
     pub use super::market::{
         ExchangeInfo, Filter, RateLimit, ServerPing, ServerTime, SymbolInfo, SymbolPrice,
     };
