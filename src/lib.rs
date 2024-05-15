@@ -7,7 +7,10 @@ mod spot;
 
 pub mod prelude {
     pub use super::http::client::{Client, ClientBuilder, ClientResult};
-    pub use super::http::error::ClientError;
+}
+
+pub mod error {
+    pub use super::http::error::{BinanceError, ClientError};
 }
 
 pub mod types {
@@ -17,4 +20,8 @@ pub mod types {
     pub type Quantity = String;
 
     pub use super::account::{ApiRestrictions, GetUserAsset};
+    pub use super::spot::{
+        OrderFill, OrderResponseFULL, OrderSide, OrderStatus, OrderType, SelfTradePreventionMode,
+        ServerPing, ServerTime, TimeInForce,
+    };
 }

@@ -3,7 +3,7 @@ use serde::Deserialize;
 use url::Url;
 
 use super::client::{Client, ClientResult};
-use super::error::ClientError;
+use super::error::{BinanceError, ClientError};
 
 impl Client {
     pub fn base_url(&self) -> ClientResult<Url> {
@@ -105,7 +105,14 @@ impl RequestBuilder {
     {
         let response = self.inner.send().await?;
 
-        Ok(response.json::<T>().await?)
+        if response.status().is_success() {
+            return Ok(response.json::<T>().await?);
+        }
+
+        match response.json::<BinanceError>().await {
+            Ok(v) => Err(ClientError::Binance(v)),
+            Err(e) => Err(ClientError::Request(e.to_string())),
+        }
     }
 
     pub(crate) fn with_api_key(self, value: &String) -> Self {

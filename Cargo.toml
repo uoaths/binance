@@ -12,4 +12,5 @@ reqwest = { version = "0.12", features = ["rustls-tls", "json"], default-feature
 ring = { version = "0.17", default-features = false }
 
 [dev-dependencies]
-tokio = { version = "1.0", features = ["full"] }
+tokio = { version = "1.0", features = ["full"], default-features = false }
+dotenv = { version = "0.15", default-features = false }

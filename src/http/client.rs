@@ -95,14 +95,31 @@ impl ClientBuilder {
 pub(crate) mod tests {
     use super::Client;
 
+    fn dotenv() {
+        dotenv::dotenv().ok();
+    }
+
     pub(crate) fn client() -> Client {
         Client::builder().build().unwrap()
     }
 
     pub(crate) fn client_with_key_secret() -> Client {
+        dotenv();
+
         Client::builder()
             .set_api_key(std::env::var("TEST_API_KEY").unwrap())
             .set_secret_key(std::env::var("TEST_SECRET_KEY").unwrap())
+            .build()
+            .unwrap()
+    }
+
+    pub(crate) fn client_with_test_net_key_secret() -> Client {
+        dotenv();
+
+        Client::builder()
+            .set_base_url(std::env::var("TEST_NET_ADDRESS").unwrap())
+            .set_api_key(std::env::var("TEST_NET_API_KEY").unwrap())
+            .set_secret_key(std::env::var("TEST_NET_SECRET_KEY").unwrap())
             .build()
             .unwrap()
     }
