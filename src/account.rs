@@ -104,6 +104,42 @@ impl Client {
             .send()
             .await
     }
+
+    pub async fn trade_fee(
+        &self,
+        symbol: &Symbol,
+        recv_window: Option<u8>,
+    ) -> ClientResult<Vec<TradeFee>> {
+        let mut url = self.base_url()?;
+        url.set_path("/sapi/v1/asset/tradeFee");
+
+        {
+            let mut query_pairs = url.query_pairs_mut();
+
+            if let Some(value) = recv_window {
+                query_pairs.append_pair("recvWindow", &value.to_string());
+            }
+
+            query_pairs.append_pair("symbol", symbol);
+            query_pairs.append_pair("timestamp", &timestamp().as_millis().to_string());
+        }
+
+        self.build_sign_request_get(url)?
+            .with_api_key(self.secret.api_key()?)
+            .send()
+            .await
+    }
+}
+
+#[derive(Debug, Serialize, Deserialize)]
+pub struct TradeFee {
+    symbol: Symbol,
+
+    #[serde(rename = "makerCommission")]
+    maker_commission: Commission,
+
+    #[serde(rename = "takerCommission")]
+    taker_commission: Commission,
 }
 
 #[derive(Debug, Serialize, Deserialize)]
@@ -115,7 +151,7 @@ pub struct UserAsset {
     pub withdrawing: Decimal,
     pub ipoable: Decimal,
 
-    #[serde(rename(serialize = "btcValuation", deserialize = "btcValuation"))]
+    #[serde(rename = "btcValuation")]
     pub btc_valuation: Decimal,
 }
 
@@ -280,5 +316,11 @@ mod tests {
     async fn test_spot_commission() {
         let client = client_with_key_secret();
         client.spot_commission(&"BTCUSDT".into()).await.unwrap();
+    }
+
+    #[tokio::test]
+    async fn test_trade_fee() {
+        let client = client_with_key_secret();
+        client.trade_fee(&"BTCUSDT".into(), None).await.unwrap();
     }
 }
