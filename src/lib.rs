@@ -21,7 +21,10 @@ pub mod types {
     pub type Quantity = String;
     pub type Commission = Decimal;
 
-    pub use super::account::{ApiRestrictions, Balance, CommissionRates, SpotAccount, UserAsset};
+    pub use super::account::{
+        ApiRestrictions, Balance, CommissionDetails, CommissionRates, DiscountDetails, SpotAccount,
+        SpotCommission, UserAsset,
+    };
     pub use super::market::{
         ExchangeInfo, Filter, RateLimit, ServerPing, ServerTime, SymbolInfo, SymbolPrice,
     };

@@ -3,7 +3,7 @@ use serde::{Deserialize, Serialize};
 use crate::{
     http::client::{Client, ClientResult},
     time::timestamp,
-    types::{Asset, Commission, Decimal, Quantity},
+    types::{Asset, Commission, Decimal, Quantity, Symbol},
 };
 
 impl Client {
@@ -79,6 +79,23 @@ impl Client {
                 query_pairs.append_pair("recvWindow", &value.to_string());
             }
 
+            query_pairs.append_pair("timestamp", &timestamp().as_millis().to_string());
+        }
+
+        self.build_sign_request_get(url)?
+            .with_api_key(self.secret.api_key()?)
+            .send()
+            .await
+    }
+
+    pub async fn spot_commission(&self, symbol: &Symbol) -> ClientResult<SpotCommission> {
+        let mut url = self.base_url()?;
+        url.set_path("/api/v3/account/commission");
+
+        {
+            let mut query_pairs = url.query_pairs_mut();
+
+            query_pairs.append_pair("symbol", symbol);
             query_pairs.append_pair("timestamp", &timestamp().as_millis().to_string());
         }
 
@@ -202,6 +219,41 @@ pub struct Balance {
     pub locked_amount: Quantity,
 }
 
+#[derive(Serialize, Deserialize, Debug)]
+pub struct SpotCommission {
+    pub symbol: Symbol,
+
+    #[serde(rename = "standardCommission")]
+    pub standard_commission: CommissionDetails,
+
+    #[serde(rename = "taxCommission")]
+    pub tax_commission: CommissionDetails,
+
+    pub discount: DiscountDetails,
+}
+
+#[derive(Serialize, Deserialize, Debug)]
+pub struct CommissionDetails {
+    pub maker: Commission,
+    pub taker: Commission,
+    pub buyer: Commission,
+    pub seller: Commission,
+}
+
+#[derive(Serialize, Deserialize, Debug)]
+pub struct DiscountDetails {
+    #[serde(rename = "enabledForAccount")]
+    pub enabled_for_account: bool,
+
+    #[serde(rename = "enabledForSymbol")]
+    pub enabled_for_symbol: bool,
+
+    #[serde(rename = "discountAsset")]
+    pub discount_asset: Asset,
+
+    pub discount: Commission,
+}
+
 #[cfg(test)]
 mod tests {
     use crate::http::client::tests::client_with_key_secret;
@@ -222,5 +274,11 @@ mod tests {
     async fn test_spot_account() {
         let client = client_with_key_secret();
         client.spot_account(None, None).await.unwrap();
+    }
+
+    #[tokio::test]
+    async fn test_spot_commission() {
+        let client = client_with_key_secret();
+        client.spot_commission(&"BTCUSDT".into()).await.unwrap();
     }
 }
