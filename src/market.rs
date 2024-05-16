@@ -81,14 +81,14 @@ impl Client {
 
 #[derive(Debug, Serialize, Deserialize)]
 pub struct SymbolPrice {
-    symbol: Symbol,
-    price: Price,
+    pub symbol: Symbol,
+    pub price: Price,
 }
 
 #[derive(Debug, Serialize, Deserialize)]
 pub struct ServerTime {
     #[serde(rename = "serverTime")]
-    server_time: u128,
+    pub server_time: u128,
 }
 
 #[derive(Debug, Serialize, Deserialize)]

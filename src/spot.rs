@@ -293,63 +293,63 @@ pub enum OrderType {
 
 #[derive(Debug, Serialize, Deserialize)]
 pub struct OrderFill {
-    price: Price,
+    pub price: Price,
 
-    qty: Quantity,
+    pub qty: Quantity,
 
-    commission: Quantity,
+    pub commission: Quantity,
 
     #[serde(rename = "commissionAsset")]
-    commission_asset: Symbol,
+    pub commission_asset: Symbol,
 
     #[serde(rename = "tradeId")]
-    trade_id: i64,
+    pub trade_id: i64,
 }
 
 #[derive(Debug, Serialize, Deserialize)]
 pub struct OrderResponseFull {
-    symbol: Symbol,
+    pub symbol: Symbol,
 
     #[serde(rename = "orderId")]
-    order_id: i64,
+    pub order_id: i64,
 
     #[serde(rename = "orderListId")]
-    order_list_id: i64,
+    pub order_list_id: i64,
 
     #[serde(rename = "clientOrderId")]
-    client_order_id: String,
+    pub client_order_id: String,
 
     #[serde(rename = "transactTime")]
-    transact_time: u128,
+    pub transact_time: u128,
 
-    price: Price,
+    pub price: Price,
 
     #[serde(rename = "origQty")]
-    orig_qty: Quantity,
+    pub orig_qty: Quantity,
 
     #[serde(rename = "executedQty")]
-    executed_qty: Quantity,
+    pub executed_qty: Quantity,
 
     #[serde(rename = "cummulativeQuoteQty")]
-    cummulative_quote_qty: Quantity,
+    pub cummulative_quote_qty: Quantity,
 
-    status: OrderStatus,
+    pub status: OrderStatus,
 
     #[serde(rename = "timeInForce")]
-    time_in_force: TimeInForce,
+    pub time_in_force: TimeInForce,
 
     #[serde(rename = "type")]
-    order_type: OrderType,
+    pub order_type: OrderType,
 
-    side: OrderSide,
+    pub side: OrderSide,
 
     #[serde(rename = "workingTime")]
-    working_time: u128,
+    pub working_time: u128,
 
     #[serde(rename = "selfTradePreventionMode")]
-    self_trade_prevention_mode: SelfTradePreventionMode,
+    pub self_trade_prevention_mode: SelfTradePreventionMode,
 
-    fills: Vec<OrderFill>,
+    pub fills: Vec<OrderFill>,
 }
 
 #[cfg(test)]

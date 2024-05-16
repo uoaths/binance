@@ -133,13 +133,13 @@ impl Client {
 
 #[derive(Debug, Serialize, Deserialize)]
 pub struct TradeFee {
-    symbol: Symbol,
+    pub symbol: Symbol,
 
     #[serde(rename = "makerCommission")]
-    maker_commission: Commission,
+    pub maker_commission: Commission,
 
     #[serde(rename = "takerCommission")]
-    taker_commission: Commission,
+    pub taker_commission: Commission,
 }
 
 #[derive(Debug, Serialize, Deserialize)]
