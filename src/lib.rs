@@ -30,6 +30,6 @@ pub mod types {
     };
     pub use super::spot::{
         OrderFill, OrderInfo, OrderResponseFull, OrderSide, OrderStatus, OrderType,
-        SelfTradePreventionMode, TimeInForce,
+        SelfTradePreventionMode, TimeInForce, Trade,
     };
 }
