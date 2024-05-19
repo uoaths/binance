@@ -26,7 +26,7 @@ pub mod types {
         SpotCommission, UserAsset,
     };
     pub use super::market::{
-        ExchangeInfo, Filter, RateLimit, ServerPing, ServerTime, SymbolInfo, SymbolPrice,
+        symbol_filter::*, ExchangeInfo, RateLimit, ServerPing, ServerTime, SymbolInfo, SymbolPrice,
     };
     pub use super::spot::{
         OrderFill, OrderInfo, OrderResponseFull, OrderSide, OrderStatus, OrderType,
