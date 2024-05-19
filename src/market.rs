@@ -177,7 +177,7 @@ pub struct SymbolInfo {
     #[serde(rename = "isMarginTradingAllowed")]
     pub is_margin_trading_allowed: bool,
 
-    pub filters: Vec<Filter>,
+    pub filters: Vec<symbol_filter::SymbolFilter>,
 
     pub permissions: Vec<JsonValue>, // TODO
 
@@ -191,75 +191,219 @@ pub struct SymbolInfo {
     pub allowed_self_trade_prevention_modes: Vec<String>,
 }
 
-#[derive(Debug, Serialize, Deserialize)]
-pub struct Filter {
-    #[serde(rename = "filterType")]
-    pub filter_type: String,
+pub mod symbol_filter {
+    use serde::{Deserialize, Serialize};
 
-    #[serde(rename = "minPrice")]
-    pub min_price: Option<String>,
+    use crate::types::{Decimal, Price, Quantity};
 
-    #[serde(rename = "maxPrice")]
-    pub max_price: Option<String>,
+    // PRICE_FILTER
+    #[derive(Debug, Serialize, Deserialize)]
+    #[serde(rename_all = "camelCase")]
+    pub struct SymbolPriceFilter {
+        #[serde(rename = "minPrice")]
+        pub min_price: Price,
 
-    #[serde(rename = "tickSize")]
-    pub tick_size: Option<String>,
+        #[serde(rename = "maxPrice")]
+        pub max_price: Price,
 
-    #[serde(rename = "minQty")]
-    pub min_qty: Option<String>,
+        #[serde(rename = "tickSize")]
+        pub tick_size: Decimal,
+    }
 
-    #[serde(rename = "maxQty")]
-    pub max_qty: Option<String>,
+    // PERCENT_PRICE
+    #[derive(Debug, Serialize, Deserialize)]
+    #[serde(rename_all = "camelCase")]
+    pub struct SymbolPercentPriceFilter {
+        #[serde(rename = "multiplierUp")]
+        pub multiplier_up: Decimal,
 
-    #[serde(rename = "stepSize")]
-    pub step_size: Option<String>,
+        #[serde(rename = "multiplierDown")]
+        pub multiplier_down: Decimal,
 
-    pub limit: Option<u32>,
+        #[serde(rename = "avgPriceMins")]
+        pub avg_price_mins: u32,
+    }
 
-    #[serde(rename = "minTrailingAboveDelta")]
-    pub min_trailing_above_delta: Option<u32>,
+    // PERCENT_PRICE_BY_SIDE
+    #[derive(Debug, Serialize, Deserialize)]
+    #[serde(rename_all = "camelCase")]
+    pub struct SymbolPercentPriceBySideFilter {
+        #[serde(rename = "bidMultiplierUp")]
+        pub bid_multiplier_up: Decimal,
 
-    #[serde(rename = "maxTrailingAboveDelta")]
-    pub max_trailing_above_delta: Option<u32>,
+        #[serde(rename = "bidMultiplierDown")]
+        pub bid_multiplier_down: Decimal,
 
-    #[serde(rename = "minTrailingBelowDelta")]
-    pub min_trailing_below_delta: Option<u32>,
+        #[serde(rename = "askMultiplierUp")]
+        pub ask_multiplier_up: Decimal,
 
-    #[serde(rename = "maxTrailingBelowDelta")]
-    pub max_trailing_below_delta: Option<u32>,
+        #[serde(rename = "askMultiplierDown")]
+        pub ask_multiplier_down: Decimal,
 
-    #[serde(rename = "bidMultiplierUp")]
-    pub bid_multiplier_up: Option<String>,
+        #[serde(rename = "avgPriceMins")]
+        pub avg_price_mins: u32,
+    }
 
-    #[serde(rename = "bidMultiplierDown")]
-    pub bid_multiplier_down: Option<String>,
+    // LOT_SIZE
+    #[derive(Debug, Serialize, Deserialize)]
+    #[serde(rename_all = "camelCase")]
+    pub struct SymbolLotSizeFilter {
+        #[serde(rename = "minQty")]
+        pub min_qty: Quantity,
 
-    #[serde(rename = "askMultiplierUp")]
-    pub ask_multiplier_up: Option<String>,
+        #[serde(rename = "maxQty")]
+        pub max_qty: Quantity,
 
-    #[serde(rename = "askMultiplierDown")]
-    pub ask_multiplier_down: Option<String>,
+        #[serde(rename = "stepSize")]
+        pub step_size: Decimal,
+    }
 
-    #[serde(rename = "avgPriceMins")]
-    pub avg_price_mins: Option<u8>,
+    // MIN_NOTIONAL
+    #[derive(Debug, Serialize, Deserialize)]
+    #[serde(rename_all = "camelCase")]
+    pub struct SymbolMinNotionalFilter {
+        #[serde(rename = "minNotional")]
+        pub min_notional: Quantity,
 
-    #[serde(rename = "minNotional")]
-    pub min_notional: Option<String>,
+        #[serde(rename = "applyToMarket")]
+        pub apply_to_market: bool,
 
-    #[serde(rename = "applyMinToMarket")]
-    pub apply_min_to_market: Option<bool>,
+        #[serde(rename = "avgPriceMins")]
+        pub avg_price_mins: u32,
+    }
 
-    #[serde(rename = "maxNotional")]
-    pub max_notional: Option<String>,
+    // NOTIONAL
+    #[derive(Debug, Serialize, Deserialize)]
+    #[serde(rename_all = "camelCase")]
+    pub struct SymbolNotionalFilter {
+        #[serde(rename = "minNotional")]
+        pub min_notional: Quantity,
 
-    #[serde(rename = "applyMaxToMarket")]
-    pub apply_max_to_market: Option<bool>,
+        #[serde(rename = "applyMinToMarket")]
+        pub apply_min_to_market: bool,
 
-    #[serde(rename = "maxNumOrders")]
-    pub max_num_orders: Option<u32>,
+        #[serde(rename = "maxNotional")]
+        pub max_notional: Quantity,
 
-    #[serde(rename = "maxNumAlgoOrders")]
-    pub max_num_algo_orders: Option<u32>,
+        #[serde(rename = "applyMaxToMarket")]
+        pub apply_max_to_market: bool,
+
+        #[serde(rename = "avgPriceMins")]
+        pub avg_price_mins: u32,
+    }
+
+    // ICEBERG_PARTS
+    #[derive(Debug, Serialize, Deserialize)]
+    #[serde(rename_all = "camelCase")]
+    pub struct SymbolIcebergPartsfilter {
+        pub limit: u32,
+    }
+
+    // MARKET_LOT_SIZE
+    #[derive(Debug, Serialize, Deserialize)]
+    #[serde(rename_all = "camelCase")]
+    pub struct SymbolMarketLotSizeFilter {
+        #[serde(rename = "minQty")]
+        pub min_qty: Quantity,
+
+        #[serde(rename = "maxQty")]
+        pub max_qty: Quantity,
+
+        #[serde(rename = "stepSize")]
+        pub step_size: Decimal,
+    }
+
+    // MAX_NUM_ORDERS
+    #[derive(Debug, Serialize, Deserialize)]
+    #[serde(rename_all = "camelCase")]
+    pub struct SymbolMaxNumOrdersFilter {
+        #[serde(rename = "maxNumOrders")]
+        pub max_num_orders: i64,
+    }
+
+    // MAX_NUM_ALGO_ORDERS
+    #[derive(Debug, Serialize, Deserialize)]
+    #[serde(rename_all = "camelCase")]
+    pub struct SymbolMaxNumAlgoOrdersFilter {
+        #[serde(rename = "maxNumAlgoOrders")]
+        pub max_num_algo_orders: u32,
+    }
+
+    // MAX_NUM_ICEBERG_ORDERS
+    #[derive(Debug, Serialize, Deserialize)]
+    #[serde(rename_all = "camelCase")]
+    pub struct SymbolMaxNumIcebergOrdersFilter {
+        #[serde(rename = "maxNumIcebergOrders")]
+        pub max_num_iceberg_orders: u32,
+    }
+
+    // MAX_POSITION
+    #[derive(Debug, Serialize, Deserialize)]
+    #[serde(rename_all = "camelCase")]
+    pub struct SymbolMaxPositionFilter {
+        #[serde(rename = "maxPosition")]
+        pub max_position: Decimal,
+    }
+
+    // TRAILING_DELTA
+    #[derive(Debug, Serialize, Deserialize)]
+    #[serde(rename_all = "camelCase")]
+    pub struct SymbolTrailingDeltaFilter {
+        #[serde(rename = "minTrailingAboveDelta")]
+        pub min_trailing_above_delta: i32,
+
+        #[serde(rename = "maxTrailingAboveDelta")]
+        pub max_trailing_above_delta: i32,
+
+        #[serde(rename = "minTrailingBelowDelta")]
+        pub min_trailing_below_delta: i32,
+
+        #[serde(rename = "maxTrailingBelowDelta")]
+        pub max_trailing_below_delta: i32,
+    }
+
+    #[derive(Debug, Serialize, Deserialize)]
+    #[serde(tag = "filterType", rename_all = "camelCase")]
+    pub enum SymbolFilter {
+        #[serde(rename = "PRICE_FILTER")]
+        PriceFilter(SymbolPriceFilter),
+
+        #[serde(rename = "PERCENT_PRICE")]
+        PercentPrice(SymbolPercentPriceFilter),
+
+        #[serde(rename = "PERCENT_PRICE_BY_SIDE")]
+        PercentPriceBySide(SymbolPercentPriceBySideFilter),
+
+        #[serde(rename = "LOT_SIZE")]
+        LotSize(SymbolLotSizeFilter),
+
+        #[serde(rename = "MIN_NOTIONAL")]
+        MinNotional(SymbolMinNotionalFilter),
+
+        #[serde(rename = "NOTIONAL")]
+        Notional(SymbolNotionalFilter),
+
+        #[serde(rename = "ICEBERG_PARTS")]
+        IcebergParts(SymbolIcebergPartsfilter),
+
+        #[serde(rename = "MARKET_LOT_SIZE")]
+        MarketLotSize(SymbolMarketLotSizeFilter),
+
+        #[serde(rename = "MAX_NUM_ORDERS")]
+        MaxNumOrders(SymbolMaxNumOrdersFilter),
+
+        #[serde(rename = "MAX_NUM_ALGO_ORDERS")]
+        MaxNumAlgoOrders(SymbolMaxNumAlgoOrdersFilter),
+
+        #[serde(rename = "MAX_NUM_ICEBERG_ORDERS")]
+        MaxNumIcebergOrders(SymbolMaxNumIcebergOrdersFilter),
+
+        #[serde(rename = "MAX_POSITION")]
+        MaxPosition(SymbolMaxPositionFilter),
+
+        #[serde(rename = "TRAILING_DELTA")]
+        TrailingDelta(SymbolTrailingDeltaFilter),
+    }
 }
 
 #[cfg(test)]
@@ -312,5 +456,27 @@ mod tests {
     async fn test_get_api_restrictions() {
         let client = client();
         client.prices(None).await.unwrap();
+    }
+
+    #[test]
+    fn test_symbol_filters_serde() {
+        use super::symbol_filter::SymbolFilter;
+
+        let json_data = r#"[{"filterType":"PRICE_FILTER","minPrice":"0.00000100","maxPrice":"100000.00000000","tickSize":"0.00000100"},{"filterType":"PERCENT_PRICE","multiplierUp":"5","multiplierDown":"0.2","avgPriceMins":5},{"filterType":"PERCENT_PRICE_BY_SIDE","bidMultiplierUp":"1.2","bidMultiplierDown":"0.2","askMultiplierUp":"5","askMultiplierDown":"0.8","avgPriceMins":1},{"filterType":"LOT_SIZE","minQty":"0.00100000","maxQty":"100000.00000000","stepSize":"0.00100000"},{"filterType":"MIN_NOTIONAL","minNotional":"0.00100000","applyToMarket":true,"avgPriceMins":5},{"filterType":"NOTIONAL","minNotional":"10.00000000","applyMinToMarket":false,"maxNotional":"10000.00000000","applyMaxToMarket":false,"avgPriceMins":5},{"filterType":"ICEBERG_PARTS","limit":10},{"filterType":"MARKET_LOT_SIZE","minQty":"0.00100000","maxQty":"100000.00000000","stepSize":"0.00100000"},{"filterType":"MAX_NUM_ORDERS","maxNumOrders":25},{"filterType":"MAX_NUM_ALGO_ORDERS","maxNumAlgoOrders":5},{"filterType":"MAX_NUM_ICEBERG_ORDERS","maxNumIcebergOrders":5},{"filterType":"MAX_POSITION","maxPosition":"10.00000000"},{"filterType":"TRAILING_DELTA","minTrailingAboveDelta":10,"maxTrailingAboveDelta":2000,"minTrailingBelowDelta":10,"maxTrailingBelowDelta":2000}]"#;
+
+        let filters: Vec<SymbolFilter> = serde_json::from_str(json_data).unwrap();
+        for i in filters.iter() {
+            match i {
+                SymbolFilter::PriceFilter(v) => {
+                    assert_eq!(v.max_price, "100000.00000000");
+                    assert_eq!(v.min_price, "0.00000100");
+                    assert_eq!(v.tick_size, "0.00000100")
+                }
+                _ => continue,
+            }
+        }
+        assert_eq!(filters.len(), 13);
+
+        assert_eq!(serde_json::to_string(&filters).unwrap(), json_data);
     }
 }
