@@ -3,7 +3,7 @@ use serde::{Deserialize, Serialize};
 use crate::{
     http::client::{Client, ClientResult},
     time::timestamp,
-    types::{Price, Quantity, Symbol},
+    types::{Asset, Decimal, Price, Quantity, Symbol},
 };
 
 impl Client {
@@ -73,8 +73,8 @@ impl Client {
 
     pub async fn spot_order_info(
         &self,
-        id: i64,
         symbol: &Symbol,
+        id: i64,
         recv_window: Option<u8>,
     ) -> ClientResult<OrderInfo> {
         let mut url = self.base_url()?;
@@ -123,6 +123,66 @@ impl Client {
 
             if let Some(value) = end_time {
                 query_pairs.append_pair("endTime", &value.to_string());
+            }
+
+            if let Some(value) = limit {
+                query_pairs.append_pair("limit", &value.to_string());
+            }
+
+            if let Some(value) = recv_window {
+                query_pairs.append_pair("recvWindow", &value.to_string());
+            }
+
+            query_pairs.append_pair("symbol", symbol);
+            query_pairs.append_pair("timestamp", &timestamp().as_millis().to_string());
+        }
+
+        self.build_sign_request_get(url)?
+            .with_api_key(self.secret.api_key()?)
+            .send()
+            .await
+    }
+
+    pub async fn spot_trade(
+        &self,
+        symbol: &Symbol,
+        id: i64,
+        recv_window: Option<u8>,
+    ) -> ClientResult<Vec<Trade>> {
+        self.spot_trades(symbol, Some(id), None, None, None, None, recv_window)
+            .await
+    }
+
+    pub async fn spot_trades(
+        &self,
+        symbol: &Symbol,
+        id: Option<i64>,
+        start_time: Option<u128>,
+        end_time: Option<u128>,
+        from_id: Option<i64>,
+        limit: Option<u16>,
+        recv_window: Option<u8>,
+    ) -> ClientResult<Vec<Trade>> {
+        let mut url = self.base_url()?;
+        url.set_path("/api/v3/myTrades");
+
+        {
+            let mut query_pairs = url.query_pairs_mut();
+
+            if let Some(value) = id {
+                query_pairs.append_pair("orderId", &value.to_string());
+            }
+
+            if let Some(value) = start_time {
+                query_pairs.append_pair("startTime", &value.to_string());
+            }
+
+            if let Some(value) = end_time {
+                query_pairs.append_pair("endTime", &value.to_string());
+            }
+
+            if let Some(value) = from_id {
+                query_pairs.append_pair("fromId", &value.to_string());
             }
 
             if let Some(value) = limit {
@@ -352,6 +412,37 @@ pub struct OrderResponseFull {
     pub fills: Vec<OrderFill>,
 }
 
+#[derive(Debug, Serialize, Deserialize)]
+pub struct Trade {
+    symbol: Symbol,
+    id: i64,
+    price: Price,
+    qty: Quantity,
+    commission: Decimal,
+    time: u128,
+
+    #[serde(rename = "orderId")]
+    order_id: u64,
+
+    #[serde(rename = "orderListId")]
+    order_list_id: i64,
+
+    #[serde(rename = "quoteQty")]
+    quote_qty: Quantity,
+
+    #[serde(rename = "commissionAsset")]
+    commission_asset: Asset,
+
+    #[serde(rename = "isBuyer")]
+    is_buyer: bool,
+
+    #[serde(rename = "isMaker")]
+    is_maker: bool,
+
+    #[serde(rename = "isBestMatch")]
+    is_best_match: bool,
+}
+
 #[cfg(test)]
 mod tests {
     use super::OrderSide;
@@ -410,12 +501,35 @@ mod tests {
             .unwrap();
 
         client
-            .spot_order_info(order.order_id, &order.symbol, None)
+            .spot_order_info(&order.symbol, order.order_id, None)
             .await
             .unwrap();
 
         client
             .spot_all_order_info(&order.symbol, None, None, None, None, None)
+            .await
+            .unwrap();
+    }
+
+    #[tokio::test]
+    async fn test_spot_trade() {
+        let client = client_with_test_net_key_secret();
+        let order = client
+            .spot_market_order_with_quote(
+                &"BTCUSDT".into(),
+                OrderSide::Buy,
+                &"10.14159".into(),
+                None,
+            )
+            .await
+            .unwrap();
+
+        client
+            .spot_trade(&"BTCUSDT".into(), order.order_id, None)
+            .await
+            .unwrap();
+        client
+            .spot_trades(&"BTCUSDT".into(), None, None, None, None, None, None)
             .await
             .unwrap();
     }
