@@ -204,7 +204,7 @@ impl Client {
     }
 }
 
-#[derive(Debug, Serialize, Deserialize)]
+#[derive(Debug, Clone, Serialize, Deserialize)]
 pub struct OrderInfo {
     pub symbol: Symbol,
 
@@ -262,7 +262,7 @@ pub struct OrderInfo {
     pub self_trade_prevention_mode: String,
 }
 
-#[derive(Debug, Serialize, Deserialize)]
+#[derive(Debug, Clone, Copy, Serialize, Deserialize)]
 pub enum OrderSide {
     #[serde(rename = "BUY")]
     Buy,
@@ -280,7 +280,7 @@ impl OrderSide {
     }
 }
 
-#[derive(Debug, Serialize, Deserialize)]
+#[derive(Debug, Clone, Serialize, Deserialize)]
 pub enum SelfTradePreventionMode {
     None,
 
@@ -294,7 +294,7 @@ pub enum SelfTradePreventionMode {
     ExpireBoth,
 }
 
-#[derive(Debug, Serialize, Deserialize)]
+#[derive(Debug, Clone, Copy, Serialize, Deserialize)]
 pub enum OrderStatus {
     #[serde(rename = "NEW")]
     New,
@@ -316,9 +316,12 @@ pub enum OrderStatus {
 
     #[serde(rename = "EXPIRED")]
     Expired,
+
+    #[serde(rename = "EXPIRED_IN_MATCH")]
+    ExpiredInMatch,
 }
 
-#[derive(Debug, Serialize, Deserialize)]
+#[derive(Debug, Clone, Copy, Serialize, Deserialize)]
 pub enum TimeInForce {
     #[serde(rename = "GTC")]
     Gtc,
@@ -330,7 +333,7 @@ pub enum TimeInForce {
     Fok,
 }
 
-#[derive(Debug, Serialize, Deserialize)]
+#[derive(Debug, Clone, Copy, Serialize, Deserialize)]
 pub enum OrderType {
     #[serde(rename = "LIMIT")]
     Limit,
@@ -351,7 +354,7 @@ pub enum OrderType {
     TakeProfitLimit,
 }
 
-#[derive(Debug, Serialize, Deserialize)]
+#[derive(Debug, Clone, Serialize, Deserialize)]
 pub struct OrderFill {
     pub price: Price,
 
@@ -366,7 +369,7 @@ pub struct OrderFill {
     pub trade_id: i64,
 }
 
-#[derive(Debug, Serialize, Deserialize)]
+#[derive(Debug, Clone, Serialize, Deserialize)]
 pub struct OrderResponseFull {
     pub symbol: Symbol,
 
@@ -412,35 +415,35 @@ pub struct OrderResponseFull {
     pub fills: Vec<OrderFill>,
 }
 
-#[derive(Debug, Serialize, Deserialize)]
+#[derive(Debug, Clone, Serialize, Deserialize)]
 pub struct Trade {
-    symbol: Symbol,
-    id: i64,
-    price: Price,
-    qty: Quantity,
-    commission: Decimal,
-    time: u128,
+    pub symbol: Symbol,
+    pub id: i64,
+    pub price: Price,
+    pub qty: Quantity,
+    pub commission: Decimal,
+    pub time: u128,
 
     #[serde(rename = "orderId")]
-    order_id: u64,
+    pub order_id: u64,
 
     #[serde(rename = "orderListId")]
-    order_list_id: i64,
+    pub order_list_id: i64,
 
     #[serde(rename = "quoteQty")]
-    quote_qty: Quantity,
+    pub quote_qty: Quantity,
 
     #[serde(rename = "commissionAsset")]
-    commission_asset: Asset,
+    pub commission_asset: Asset,
 
     #[serde(rename = "isBuyer")]
-    is_buyer: bool,
+    pub is_buyer: bool,
 
     #[serde(rename = "isMaker")]
-    is_maker: bool,
+    pub is_maker: bool,
 
     #[serde(rename = "isBestMatch")]
-    is_best_match: bool,
+    pub is_best_match: bool,
 }
 
 #[cfg(test)]
