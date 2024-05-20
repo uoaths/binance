@@ -131,7 +131,7 @@ impl Client {
     }
 }
 
-#[derive(Debug, Serialize, Deserialize)]
+#[derive(Debug, Clone, Serialize, Deserialize)]
 pub struct TradeFee {
     pub symbol: Symbol,
 
@@ -142,7 +142,7 @@ pub struct TradeFee {
     pub taker_commission: Commission,
 }
 
-#[derive(Debug, Serialize, Deserialize)]
+#[derive(Debug, Clone, Serialize, Deserialize)]
 pub struct UserAsset {
     pub asset: Asset,
     pub free: Decimal,
@@ -155,7 +155,7 @@ pub struct UserAsset {
     pub btc_valuation: Decimal,
 }
 
-#[derive(Debug, Serialize, Deserialize)]
+#[derive(Debug, Clone, Serialize, Deserialize)]
 pub struct ApiRestrictions {
     #[serde(rename = "ipRestrict")]
     pub ip_restrict: bool,
@@ -191,7 +191,7 @@ pub struct ApiRestrictions {
     pub enable_margin: bool,
 }
 
-#[derive(Debug, Serialize, Deserialize)]
+#[derive(Debug, Clone, Serialize, Deserialize)]
 pub struct SpotAccount {
     #[serde(rename = "makerCommission")]
     pub maker_commission: u32,
@@ -238,7 +238,7 @@ pub struct SpotAccount {
     pub uid: i64,
 }
 
-#[derive(Debug, Serialize, Deserialize)]
+#[derive(Debug, Clone, Serialize, Deserialize)]
 pub struct CommissionRates {
     pub maker: Commission,
     pub taker: Commission,
@@ -246,7 +246,7 @@ pub struct CommissionRates {
     pub seller: Commission,
 }
 
-#[derive(Debug, Serialize, Deserialize)]
+#[derive(Debug, Clone, Serialize, Deserialize)]
 pub struct Balance {
     pub asset: Asset,
     pub free: Quantity,
@@ -255,7 +255,7 @@ pub struct Balance {
     pub locked_amount: Quantity,
 }
 
-#[derive(Serialize, Deserialize, Debug)]
+#[derive(Debug, Clone, Serialize, Deserialize)]
 pub struct SpotCommission {
     pub symbol: Symbol,
 
@@ -268,7 +268,7 @@ pub struct SpotCommission {
     pub discount: DiscountDetails,
 }
 
-#[derive(Serialize, Deserialize, Debug)]
+#[derive(Debug, Clone, Serialize, Deserialize)]
 pub struct CommissionDetails {
     pub maker: Commission,
     pub taker: Commission,
@@ -276,7 +276,7 @@ pub struct CommissionDetails {
     pub seller: Commission,
 }
 
-#[derive(Serialize, Deserialize, Debug)]
+#[derive(Debug, Clone, Serialize, Deserialize)]
 pub struct DiscountDetails {
     #[serde(rename = "enabledForAccount")]
     pub enabled_for_account: bool,

@@ -79,22 +79,22 @@ impl Client {
     }
 }
 
-#[derive(Debug, Serialize, Deserialize)]
+#[derive(Debug, Clone, Serialize, Deserialize)]
 pub struct SymbolPrice {
     pub symbol: Symbol,
     pub price: Price,
 }
 
-#[derive(Debug, Serialize, Deserialize)]
+#[derive(Debug, Clone, Serialize, Deserialize)]
 pub struct ServerTime {
     #[serde(rename = "serverTime")]
     pub server_time: u128,
 }
 
-#[derive(Debug, Serialize, Deserialize)]
+#[derive(Debug, Clone, Serialize, Deserialize)]
 pub struct ServerPing {}
 
-#[derive(Debug, Serialize, Deserialize)]
+#[derive(Debug, Clone, Serialize, Deserialize)]
 pub struct ExchangeInfo {
     pub timezone: String,
 
@@ -110,7 +110,7 @@ pub struct ExchangeInfo {
     pub symbols: Vec<SymbolInfo>,
 }
 
-#[derive(Debug, Serialize, Deserialize)]
+#[derive(Debug, Clone, Serialize, Deserialize)]
 pub struct RateLimit {
     #[serde(rename = "rateLimitType")]
     pub rate_limit_type: String,
@@ -123,7 +123,7 @@ pub struct RateLimit {
     pub limit: u32,
 }
 
-#[derive(Debug, Serialize, Deserialize)]
+#[derive(Debug, Clone, Serialize, Deserialize)]
 pub struct SymbolInfo {
     pub symbol: Symbol,
 
@@ -197,7 +197,7 @@ pub mod symbol_filter {
     use crate::types::{Decimal, Price, Quantity};
 
     // PRICE_FILTER
-    #[derive(Debug, Serialize, Deserialize)]
+    #[derive(Debug, Clone, Serialize, Deserialize)]
     #[serde(rename_all = "camelCase")]
     pub struct SymbolPriceFilter {
         #[serde(rename = "minPrice")]
@@ -211,7 +211,7 @@ pub mod symbol_filter {
     }
 
     // PERCENT_PRICE
-    #[derive(Debug, Serialize, Deserialize)]
+    #[derive(Debug, Clone, Serialize, Deserialize)]
     #[serde(rename_all = "camelCase")]
     pub struct SymbolPercentPriceFilter {
         #[serde(rename = "multiplierUp")]
@@ -225,7 +225,7 @@ pub mod symbol_filter {
     }
 
     // PERCENT_PRICE_BY_SIDE
-    #[derive(Debug, Serialize, Deserialize)]
+    #[derive(Debug, Clone, Serialize, Deserialize)]
     #[serde(rename_all = "camelCase")]
     pub struct SymbolPercentPriceBySideFilter {
         #[serde(rename = "bidMultiplierUp")]
@@ -245,7 +245,7 @@ pub mod symbol_filter {
     }
 
     // LOT_SIZE
-    #[derive(Debug, Serialize, Deserialize)]
+    #[derive(Debug, Clone, Serialize, Deserialize)]
     #[serde(rename_all = "camelCase")]
     pub struct SymbolLotSizeFilter {
         #[serde(rename = "minQty")]
@@ -259,7 +259,7 @@ pub mod symbol_filter {
     }
 
     // MIN_NOTIONAL
-    #[derive(Debug, Serialize, Deserialize)]
+    #[derive(Debug, Clone, Serialize, Deserialize)]
     #[serde(rename_all = "camelCase")]
     pub struct SymbolMinNotionalFilter {
         #[serde(rename = "minNotional")]
@@ -273,7 +273,7 @@ pub mod symbol_filter {
     }
 
     // NOTIONAL
-    #[derive(Debug, Serialize, Deserialize)]
+    #[derive(Debug, Clone, Serialize, Deserialize)]
     #[serde(rename_all = "camelCase")]
     pub struct SymbolNotionalFilter {
         #[serde(rename = "minNotional")]
@@ -293,14 +293,14 @@ pub mod symbol_filter {
     }
 
     // ICEBERG_PARTS
-    #[derive(Debug, Serialize, Deserialize)]
+    #[derive(Debug, Clone, Serialize, Deserialize)]
     #[serde(rename_all = "camelCase")]
     pub struct SymbolIcebergPartsfilter {
         pub limit: u32,
     }
 
     // MARKET_LOT_SIZE
-    #[derive(Debug, Serialize, Deserialize)]
+    #[derive(Debug, Clone, Serialize, Deserialize)]
     #[serde(rename_all = "camelCase")]
     pub struct SymbolMarketLotSizeFilter {
         #[serde(rename = "minQty")]
@@ -314,7 +314,7 @@ pub mod symbol_filter {
     }
 
     // MAX_NUM_ORDERS
-    #[derive(Debug, Serialize, Deserialize)]
+    #[derive(Debug, Clone, Serialize, Deserialize)]
     #[serde(rename_all = "camelCase")]
     pub struct SymbolMaxNumOrdersFilter {
         #[serde(rename = "maxNumOrders")]
@@ -322,7 +322,7 @@ pub mod symbol_filter {
     }
 
     // MAX_NUM_ALGO_ORDERS
-    #[derive(Debug, Serialize, Deserialize)]
+    #[derive(Debug, Clone, Serialize, Deserialize)]
     #[serde(rename_all = "camelCase")]
     pub struct SymbolMaxNumAlgoOrdersFilter {
         #[serde(rename = "maxNumAlgoOrders")]
@@ -330,7 +330,7 @@ pub mod symbol_filter {
     }
 
     // MAX_NUM_ICEBERG_ORDERS
-    #[derive(Debug, Serialize, Deserialize)]
+    #[derive(Debug, Clone, Serialize, Deserialize)]
     #[serde(rename_all = "camelCase")]
     pub struct SymbolMaxNumIcebergOrdersFilter {
         #[serde(rename = "maxNumIcebergOrders")]
@@ -338,7 +338,7 @@ pub mod symbol_filter {
     }
 
     // MAX_POSITION
-    #[derive(Debug, Serialize, Deserialize)]
+    #[derive(Debug, Clone, Serialize, Deserialize)]
     #[serde(rename_all = "camelCase")]
     pub struct SymbolMaxPositionFilter {
         #[serde(rename = "maxPosition")]
@@ -346,7 +346,7 @@ pub mod symbol_filter {
     }
 
     // TRAILING_DELTA
-    #[derive(Debug, Serialize, Deserialize)]
+    #[derive(Debug, Clone, Serialize, Deserialize)]
     #[serde(rename_all = "camelCase")]
     pub struct SymbolTrailingDeltaFilter {
         #[serde(rename = "minTrailingAboveDelta")]
@@ -362,7 +362,7 @@ pub mod symbol_filter {
         pub max_trailing_below_delta: i32,
     }
 
-    #[derive(Debug, Serialize, Deserialize)]
+    #[derive(Debug, Clone, Serialize, Deserialize)]
     #[serde(tag = "filterType", rename_all = "camelCase")]
     pub enum SymbolFilter {
         #[serde(rename = "PRICE_FILTER")]
